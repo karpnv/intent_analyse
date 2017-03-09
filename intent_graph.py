@@ -8,12 +8,15 @@ import re
 import numpy
 
 class Intent_graph():
-    def __init__(self):
+    def __init__(self, dir='with_tags'):
         logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s', level=logging.INFO)
-        self.dir='with_tags_one'#'politru/-21337773_1/'
+        self.dir=dir#'politru/-21337773_1/'
         self.pattern=re.compile('\W')
     def sub(self, str1):
-        return self.pattern.sub('', str(str1))
+        try:
+            return self.pattern.sub('', str(str1))
+        except:
+            return ''
     def parse(self, f_name='comm_politru_2_23812.csv'):
         g1 = g.Graph(directed=True)
         g1.add_vertices(1)
@@ -55,15 +58,15 @@ class Intent_graph():
         root=df1.loc[0,'Id of post']
         g1.add_vertices(df1.shape[0])
         g1.vs['id']=[root]+df1['id'].tolist()
-        g1.vs["name"]=[str(root)]+df1['id'].apply(str).tolist()
-        g1.vs["Label"]=[str(root)]+df1['Id of comment.'].apply(str).tolist()
-        g1.vs["author"]=['']+df1['Id of author of comment.'].apply(str).tolist()
-        g1.vs["text"]=['']+df1['text'].tolist()
+        g1.vs["name"]=[str(root)]+df1['id'].fillna('').apply(str).tolist()
+        g1.vs["Label"]=[str(root)]+df1['Id of comment.'].fillna('').apply(str).tolist()
+        g1.vs["author"]=['']+df1['Id of author of comment.'].fillna('').apply(str).tolist()
+        g1.vs["text"]=['']+df1['text'].fillna('').tolist()
         g1.vs["likes"]=[0]+df1['likes'].tolist()
-        g1.vs["date"]=['']+df1['date'].tolist()
-        g1.vs["intent"]=['']+df1.ix[:,-4].tolist()
-        g1.vs["target"]=['']+df1['target'].tolist()
-        g1.vs["content"]=['']+df1.ix[:,-3].apply(self.sub).tolist()#
+        g1.vs["date"]=['']+df1['date'].fillna('').tolist()
+        g1.vs["intent"]=['']+df1.ix[:,-4].fillna('').tolist()
+        g1.vs["target"]=['']+df1['target'].fillna('').tolist()
+        g1.vs["content"]=['']+df1.ix[:,-3].fillna('').apply(self.sub).tolist()#
 
         #print(g1.vs["date"])
         for item in df1.iterrows():
@@ -140,10 +143,13 @@ class Intent_graph():
     def take_path(self, graph):
         print(graph)
 
-gr=Intent_graph()
-#graph_dict=gr.iter_dir(gr.write_gml, '.csv')
-graph_dict=gr.iter_dir(gr.read_gml, '.gml')
-print(len(graph_dict))
-for key in graph_dict:
-    print(key, graph_dict[key])
-    #gr.take_path(graph_dict[key])
+if __name__ == '__main__':
+    gr=Intent_graph('with_tags')
+    graph_dict=gr.iter_dir(gr.write_gml, '.csv')
+    # graph_dict=gr.iter_dir(gr.read_gml, '.gml')
+    print(len(graph_dict))
+    # for key in graph_dict:
+    #     print(key, graph_dict[key])
+        #gr.take_path(graph_dict[key])
+
+    #9-Шарова-comm_inosmi_25_197198 ???????
