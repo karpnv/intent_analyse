@@ -64,8 +64,8 @@ class Intent_graph():
         g1.vs["text"]=['']+df1['text'].fillna('').tolist()
         g1.vs["likes"]=[0]+df1['likes'].tolist()
         g1.vs["date"]=['']+df1['date'].fillna('').tolist()
-        g1.vs["intent"]=['']+df1.ix[:,-4].fillna('').tolist()
-        g1.vs["target"]=['']+df1['target'].fillna('').tolist()
+        g1.vs["intent"]=['0']+df1.ix[:,-4].fillna('').tolist()
+        g1.vs["target"]=['0']+df1['target'].fillna('').tolist()
         g1.vs["content"]=['']+df1.ix[:,-3].fillna('').apply(self.sub).tolist()#
 
         #print(g1.vs["date"])
@@ -110,19 +110,28 @@ class Intent_graph():
         #g.plot(self.g1, layout=layout)#, vertex_color = ["blue"]+["red"]*37)
 
 
-    def iter_dir(self, func, ext_name='.csv'):
+    def iter_dir(self, func, ext_name='.csv', group_id=0):
         graph_dict={}
         i=0
         for name in sorted(os.listdir(self.dir)):
             path = os.path.join(self.dir, name)
             if os.path.isdir(path):
                 for fname in sorted(os.listdir(path)):
-                    if fname[-4:]==ext_name:
-                        fpath = os.path.join(path, fname)
-                        logging.info('fpath %s', fpath)
-                        g1=func(fpath)
-                        graph_dict[i]=g1#fname[:-4]
-                        i+=1
+                    if group_id==0:
+                        if fname[-4:]==ext_name:
+                            fpath = os.path.join(path, fname)
+                            logging.info('fpath %s', fpath)
+                            g1=func(fpath)
+                            graph_dict[i]=g1#fname[:-4]
+                            i+=1
+                    else:
+                        if fname[-4:]==ext_name and fname[0]==str(group_id):
+                            fpath = os.path.join(path, fname)
+                            logging.info('fpath %s', fpath)
+                            g1=func(fpath)
+                            graph_dict[i]=g1#fname[:-4]
+                            i+=1
+        logging.info('i= %s', i)
         return graph_dict
 
     def write_gml(self, fpath):
@@ -142,6 +151,31 @@ class Intent_graph():
 
     def take_path(self, graph):
         print(graph)
+
+    def generalise_letters(self, igraphs):
+        generalization_rule = {"I": ["а", "б", "в", "г", "д"],  # Информативно-воспроизводящий
+                               "E": ["е", "ж", "з", "и", "к"],  # Эмотивно-консолидирующий
+                               "M": ["л", "м", "н", "о", "п"],  # Манипулятивный тип, доминирование
+                               "D": ["р", "с", "т", "у", "ф"],  # Волюнтивно-директивный
+                               "R": ["х", "ц", "ч", "ш", "щ"]}  # Контрольно-реактивный
+        new_letter = {}
+        new_letter['0']='0'
+        new_letter[''] = ''
+        for key in generalization_rule:
+            for old_letter in generalization_rule[key]:
+                new_letter[old_letter] = key
+        for key in igraphs:
+            l=[]
+            for letter in igraphs[key].vs["intent"]:
+                try:
+                    l.append(new_letter[letter])
+                except KeyError:
+                    l.append('')
+            if len(igraphs[key].vs["intent"])==len(l):
+                igraphs[key].vs["g_intent"]=l
+            else:
+                logging.warning('Warning!, len(vs["intent"])!=len(l), key=%s',key)
+        return igraphs
 
 if __name__ == '__main__':
     gr=Intent_graph('with_tags')
