@@ -2,8 +2,7 @@ from intent_graph import Intent_graph
 import igraph
 import sys
 sys.path.append('../gSpan')
-from graph import Graph
-AUTO_EDGE_ID = -1
+from graph import *
 
 def read_gml_graphs(database_file_name, group_id=0):
     graphs = dict()
@@ -25,4 +24,22 @@ def read_gml_graphs(database_file_name, group_id=0):
             graphs[graph_cnt] = tgraph
     return graphs
 
-print('ok')
+if __name__ == '__main__':
+    # import sys
+    # sys.path.append('../gSpan')
+    # from gspan import gSpan
+    # gs = gSpan(
+    #     database_file_name='C:\\Users\\N\\PycharmProjects\\edit_xls\\gSpan\\graphdata\\graph.data.5',
+    #     min_support=200,
+    #     min_num_vertices=2,
+    #     max_num_vertices=float('inf'),
+    #     max_ngraphs=float('inf'),
+    #     is_undirected=1,
+    #     verbose=0,
+    #     visualize=0,
+    #     where=0)
+    # group_id=0
+    #graphs=read_gml_graphs('C:\\Users\\N\\PycharmProjects\\edit_xls\\with_tags',group_id=0)
+    #gs.graphs=graphs
+    #gs.run()
+    print('ok')
