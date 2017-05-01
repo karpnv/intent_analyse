@@ -131,7 +131,7 @@ class Intent_graph():
                             g1=func(fpath)
                             graph_dict[i]=g1#fname[:-4]
                             i+=1
-        logging.info('i= %s', i)
+        logging.info('Number of graphs = %s', i)
         return graph_dict
 
     def write_gml(self, fpath):
